@@ -1,0 +1,11 @@
+{
+  "name": "ast-pretty-print",
+  "version": "0.0.0",
+  "description": "A pretty printer for AST-like structures",
+  "main": "index.js",
+  "author": "James Kyle <me@thejameskyle.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "flow-bin": "^0.46.0"
+  }
+}
