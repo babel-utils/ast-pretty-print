@@ -1,7 +1,26 @@
 // @flow
 'use strict';
 
+const ansiStyles = require('ansi-styles');
+
 /*::
+type ThemeColor = {
+  open: string,
+  close: string,
+};
+
+type Theme = {
+  location: ThemeColor,
+  brackets: ThemeColor,
+  string: ThemeColor,
+  number: ThemeColor,
+  boolean: ThemeColor,
+  undefined: ThemeColor,
+  null: ThemeColor,
+  node: ThemeColor,
+  key: ThemeColor,
+};
+
 type Location = {
   line: number,
   column: number,
@@ -19,30 +38,39 @@ type Node = {
 };
 */
 
-let printArray = (arr, indentation) => {
+let printArray = (arr, indentation, theme) => {
   if (arr.length === 0) {
-    return '[]';
+    return theme.brackets.open + '[]' + theme.brackets.close;
   }
 
   let res = '';
 
   for (let i = 0; i < arr.length; i++) {
-    res += '\n' + indentation + '- ' + printValue(arr[i], indentation + '  ');
+    res +=
+      '\n' + indentation + '- ' + printValue(arr[i], indentation + '  ', theme);
   }
 
   return res;
 };
 
-let printKeyValue = (key, val, indentation) => {
-  return '\n' + indentation + key + ': ' + printValue(val, indentation);
+let printKeyValue = (key, val, indentation, theme) => {
+  return (
+    '\n' +
+    indentation +
+    theme.key.open +
+    key +
+    theme.key.close +
+    ': ' +
+    printValue(val, indentation, theme)
+  );
 };
 
-let printObject = (obj /*: Object */, indentation) => {
-  if (isNodeLike(obj)) return printNode(obj, indentation);
+let printObject = (obj /*: Object */, indentation, theme) => {
+  if (isNodeLike(obj)) return printNode(obj, indentation, theme);
 
   let keys = Object.keys(obj);
   if (keys.length === 0) {
-    return '{}';
+    return theme.brackets.open + '{}' + theme.brackets.close;
   }
 
   keys = keys.sort();
@@ -51,7 +79,7 @@ let printObject = (obj /*: Object */, indentation) => {
 
   for (let i = 0; i < keys.length; i++) {
     let key = keys[i];
-    res += printKeyValue(key, obj[key], indentation + '  ');
+    res += printKeyValue(key, obj[key], indentation + '  ', theme);
   }
 
   return res;
@@ -62,24 +90,34 @@ let isNodeLike = (obj /*: Object */) => {
 };
 
 let printLocationNumber = val => {
-  return typeof val === 'number' ? val : '?';
+  return typeof val === 'number' ? String(val) : '';
 };
 
 let printLocation = location => {
   if (location !== null && typeof location === 'object') {
-    return (
-      printLocationNumber(location.line) +
-      ':' +
-      printLocationNumber(location.column)
-    );
+    let line = printLocationNumber(location.line);
+    let column = printLocationNumber(location.column);
+    let splitter = line && column ? ':' : '';
+    return line + splitter + column;
   } else {
     return '';
   }
 };
 
-let printLoc = loc => {
+let printLoc = (loc, theme) => {
   if (loc !== null && typeof loc === 'object') {
-    return '(' + printLocation(loc.start) + ', ' + printLocation(loc.end) + ')';
+    let start = printLocation(loc.start);
+    let end = printLocation(loc.end);
+    let splitter = end && start ? ', ' : '';
+    return (
+      theme.location.open +
+      '(' +
+      start +
+      splitter +
+      end +
+      ')' +
+      theme.location.close
+    );
   } else {
     return '';
   }
@@ -92,36 +130,73 @@ let DROP_KEYS = {
   loc: true,
 };
 
-let printNode = (node /*: Node */, indentation) => {
-  let res = node.type + ' ' + printLoc(node.loc);
+let printNode = (node /*: Node */, indentation, theme) => {
+  let res =
+    theme.node.open +
+    node.type +
+    theme.node.close +
+    ' ' +
+    printLoc(node.loc, theme);
   let keys = Object.keys(node).sort();
 
   for (let i = 0; i < keys.length; i++) {
     let key = keys[i];
     if (DROP_KEYS[key]) continue;
-    res += printKeyValue(key, node[key], indentation + '  ');
+    res += printKeyValue(key, node[key], indentation + '  ', theme);
   }
 
   return res;
 };
 
-let printValue = (val, indentation) => {
-  if (val === null) return 'null';
+let printValue = (val, indentation, theme /*: Theme */) => {
+  if (val === null) {
+    return theme.null.open + 'null' + theme.null.close;
+  }
 
-  if (typeof val === 'boolean') return String(val);
-  if (typeof val === 'string') return `"${val}"`;
-  if (typeof val === 'number') return String(val);
-  if (typeof val === 'undefined') return 'undefined';
+  if (typeof val === 'boolean') {
+    return theme.boolean.open + String(val) + theme.boolean.close;
+  }
 
-  if (Array.isArray(val)) return printArray(val, indentation + '  ');
-  if (typeof val === 'object') return printObject(val, indentation);
+  if (typeof val === 'string') {
+    return theme.string.open + `"${val}"` + theme.string.close;
+  }
+
+  if (typeof val === 'number') {
+    return theme.number.open + String(val) + theme.number.close;
+  }
+
+  if (typeof val === 'undefined') {
+    return theme.undefined.open + 'undefined' + theme.undefined.open;
+  }
+
+  if (Array.isArray(val)) {
+    return printArray(val, indentation + '  ', theme);
+  }
+
+  if (typeof val === 'object') {
+    return printObject(val, indentation, theme);
+  }
 
   console.error(val);
   throw new Error('Unknown value type found in AST');
 };
 
-let printAST = (val /*: mixed */) => {
-  return printValue(val, '');
+let getThemeItem = (colors, ansiStyle) => {
+  return colors ? ansiStyles[ansiStyle] : {open: '', close: ''};
+};
+
+let printAST = (val /*: mixed */, theme /*: boolean */ = false) => {
+  return printValue(val, '', {
+    location: getThemeItem(theme, 'dim'),
+    brackets: getThemeItem(theme, 'white'),
+    boolean: getThemeItem(theme, 'cyan'),
+    string: getThemeItem(theme, 'green'),
+    number: getThemeItem(theme, 'yellow'),
+    null: getThemeItem(theme, 'cyan'),
+    undefined: getThemeItem(theme, 'cyan'),
+    node: getThemeItem(theme, 'bold'),
+    key: getThemeItem(theme, 'white'),
+  });
 };
 
 module.exports = printAST;
