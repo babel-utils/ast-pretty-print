@@ -16,6 +16,7 @@ type Theme = {
   number: ThemeColor,
   boolean: ThemeColor,
   undefined: ThemeColor,
+  function: ThemeColor,
   null: ThemeColor,
   node: ThemeColor,
   key: ThemeColor,
@@ -171,6 +172,10 @@ let printValue = (val, indentation, theme /*: Theme */) => {
     return theme.undefined.open + 'undefined' + theme.undefined.open;
   }
 
+  if (typeof val === 'function') {
+    return theme.function.open + 'Function' + theme.function.close;
+  }
+
   if (Array.isArray(val)) {
     return printArray(val, indentation + '  ', theme);
   }
@@ -196,6 +201,7 @@ let printAST = (val /*: mixed */, theme /*: boolean */ = false) => {
     number: getThemeItem(theme, 'yellow'),
     null: getThemeItem(theme, 'cyan'),
     undefined: getThemeItem(theme, 'cyan'),
+    function: getThemeItem(theme, 'cyan'),
     node: getThemeItem(theme, 'bold'),
     key: getThemeItem(theme, 'white'),
   });

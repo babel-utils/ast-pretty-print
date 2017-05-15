@@ -175,6 +175,7 @@ let ast = {
     body: [],
     directives: [],
   },
+  __clone: () => true,
 };
 
 console.log(printAST(ast, true));
