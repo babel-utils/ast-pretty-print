@@ -160,7 +160,7 @@ let printValue = (val, indentation, theme /*: Theme */) => {
   }
 
   if (typeof val === 'string') {
-    return theme.string.open + `"${val}"` + theme.string.close;
+    return theme.string.open + `'${val}'` + theme.string.close;
   }
 
   if (typeof val === 'number') {
