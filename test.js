@@ -7,18 +7,18 @@ let ast = {
   type: 'FunctionDeclaration',
   start: 0,
   end: 31,
-  loc: {
-    start: {
-      line: 1,
-      column: 0,
-    },
-    end: {
-      line: 1,
-      column: 31,
-    },
-    lines: {},
-    indent: 0,
-  },
+  // loc: {
+  //   start: {
+  //     line: 1,
+  //     column: 0,
+  //   },
+  //   end: {
+  //     line: 1,
+  //     column: 31,
+  //   },
+  //   lines: {},
+  //   indent: 0,
+  // },
   id: {
     type: 'Identifier',
     start: 9,

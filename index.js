@@ -131,12 +131,9 @@ let DROP_KEYS = {
 };
 
 let printNode = (node /*: Node */, indentation, theme) => {
+  let loc = printLoc(node.loc, theme);
   let res =
-    theme.node.open +
-    node.type +
-    theme.node.close +
-    ' ' +
-    printLoc(node.loc, theme);
+    theme.node.open + node.type + theme.node.close + (loc ? ' ' + loc : '');
   let keys = Object.keys(node).sort();
 
   for (let i = 0; i < keys.length; i++) {
