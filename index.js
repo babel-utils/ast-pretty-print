@@ -46,22 +46,27 @@ let printArray = (arr, indentation, theme) => {
   let res = '';
 
   for (let i = 0; i < arr.length; i++) {
-    res +=
-      '\n' + indentation + '- ' + printValue(arr[i], indentation + '  ', theme);
+    let val = printValue(arr[i], indentation + '  ', theme);
+    let space = val[0] === '\n' ? '' : ' ';
+
+    res += '\n' + indentation + '-' + space + val;
   }
 
   return res;
 };
 
-let printKeyValue = (key, val, indentation, theme) => {
+let printKeyValue = (key, value, indentation, theme) => {
+  let val = printValue(value, indentation, theme);
+  let space = val[0] === '\n' ? '' : ' ';
   return (
     '\n' +
     indentation +
     theme.key.open +
     key +
     theme.key.close +
-    ': ' +
-    printValue(val, indentation, theme)
+    ':' +
+    space +
+    val
   );
 };
 
@@ -108,7 +113,7 @@ let printLoc = (loc, theme) => {
   if (loc !== null && typeof loc === 'object') {
     let start = printLocation(loc.start);
     let end = printLocation(loc.end);
-    let splitter = end && start ? ', ' : '';
+    let splitter = end && start ? ',' : '';
     return (
       theme.location.open +
       '(' +
