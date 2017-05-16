@@ -169,7 +169,7 @@ let printValue = (val, indentation, theme /*: Theme */) => {
   }
 
   if (typeof val === 'undefined') {
-    return theme.undefined.open + 'undefined' + theme.undefined.open;
+    return theme.undefined.open + 'undefined' + theme.undefined.close;
   }
 
   if (typeof val === 'function') {
