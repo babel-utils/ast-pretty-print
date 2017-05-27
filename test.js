@@ -179,3 +179,7 @@ let ast = {
 };
 
 console.log(printAST(ast, true));
+
+let obj = {};
+obj.obj = obj;
+console.log(printAST(obj));

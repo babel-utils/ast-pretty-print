@@ -39,7 +39,7 @@ type Node = {
 };
 */
 
-let printArray = (arr, indentation, theme) => {
+let printArray = (arr, indentation, theme, refs) => {
   if (arr.length === 0) {
     return theme.brackets.open + '[]' + theme.brackets.close;
   }
@@ -47,7 +47,7 @@ let printArray = (arr, indentation, theme) => {
   let res = '';
 
   for (let i = 0; i < arr.length; i++) {
-    let val = printValue(arr[i], indentation + '  ', theme);
+    let val = printValue(arr[i], indentation + '  ', theme, refs);
     let space = val[0] === '\n' ? '' : ' ';
 
     res += '\n' + indentation + '-' + space + val;
@@ -56,8 +56,8 @@ let printArray = (arr, indentation, theme) => {
   return res;
 };
 
-let printKeyValue = (key, value, indentation, theme) => {
-  let val = printValue(value, indentation, theme);
+let printKeyValue = (key, value, indentation, theme, refs) => {
+  let val = printValue(value, indentation, theme, refs);
   let space = val[0] === '\n' ? '' : ' ';
   return (
     '\n' +
@@ -71,8 +71,8 @@ let printKeyValue = (key, value, indentation, theme) => {
   );
 };
 
-let printObject = (obj /*: Object */, indentation, theme) => {
-  if (isNodeLike(obj)) return printNode(obj, indentation, theme);
+let printObject = (obj /*: Object */, indentation, theme, refs) => {
+  if (isNodeLike(obj)) return printNode(obj, indentation, theme, refs);
 
   let keys = Object.keys(obj);
   if (keys.length === 0) {
@@ -85,7 +85,7 @@ let printObject = (obj /*: Object */, indentation, theme) => {
 
   for (let i = 0; i < keys.length; i++) {
     let key = keys[i];
-    res += printKeyValue(key, obj[key], indentation + '  ', theme);
+    res += printKeyValue(key, obj[key], indentation + '  ', theme, refs);
   }
 
   return res;
@@ -136,7 +136,7 @@ let DROP_KEYS = {
   loc: true,
 };
 
-let printNode = (node /*: Node */, indentation, theme) => {
+let printNode = (node /*: Node */, indentation, theme, refs) => {
   let loc = printLoc(node.loc, theme);
   let res =
     theme.node.open + node.type + theme.node.close + (loc ? ' ' + loc : '');
@@ -145,13 +145,13 @@ let printNode = (node /*: Node */, indentation, theme) => {
   for (let i = 0; i < keys.length; i++) {
     let key = keys[i];
     if (DROP_KEYS[key]) continue;
-    res += printKeyValue(key, node[key], indentation + '  ', theme);
+    res += printKeyValue(key, node[key], indentation + '  ', theme, refs);
   }
 
   return res;
 };
 
-let printValue = (val, indentation, theme /*: Theme */) => {
+let printValue = (val, indentation, theme /*: Theme */, refs /*: WeakSet<any> */) => {
   if (val === null) {
     return theme.null.open + 'null' + theme.null.close;
   }
@@ -176,12 +176,18 @@ let printValue = (val, indentation, theme /*: Theme */) => {
     return theme.function.open + 'Function' + theme.function.close;
   }
 
+  if (refs.has(val)) {
+    return '[Circular]'
+  } else {
+    refs.add(val);
+  }
+
   if (Array.isArray(val)) {
-    return printArray(val, indentation + '  ', theme);
+    return printArray(val, indentation + '  ', theme, refs);
   }
 
   if (typeof val === 'object') {
-    return printObject(val, indentation, theme);
+    return printObject(val, indentation, theme, refs);
   }
 
   console.error(val);
@@ -193,6 +199,8 @@ let getThemeItem = (colors, ansiStyle) => {
 };
 
 let printAST = (val /*: mixed */, theme /*: boolean */ = false) => {
+  const refs = new WeakSet();
+
   return printValue(val, '', {
     location: getThemeItem(theme, 'dim'),
     brackets: getThemeItem(theme, 'white'),
@@ -204,7 +212,7 @@ let printAST = (val /*: mixed */, theme /*: boolean */ = false) => {
     function: getThemeItem(theme, 'cyan'),
     node: getThemeItem(theme, 'bold'),
     key: getThemeItem(theme, 'white'),
-  });
+  }, refs);
 };
 
 module.exports = printAST;
