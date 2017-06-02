@@ -183,3 +183,7 @@ console.log(printAST(ast, true));
 let obj = {};
 obj.obj = obj;
 console.log(printAST(obj));
+
+let path = { type: 'FunctionDeclaration', node: ast };
+
+console.log(printAST(path, true));

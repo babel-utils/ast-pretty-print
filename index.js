@@ -37,6 +37,12 @@ type Node = {
   loc: Loc,
   [key: string]: mixed,
 };
+
+type Path = {
+  type: string,
+  node: Node,
+  [key: string]: mixed,
+};
 */
 
 let printArray = (arr, indentation, theme, refs) => {
@@ -72,6 +78,7 @@ let printKeyValue = (key, value, indentation, theme, refs) => {
 };
 
 let printObject = (obj /*: Object */, indentation, theme, refs) => {
+  if (isPathLike(obj)) return printPath(obj, indentation, theme, refs);
   if (isNodeLike(obj)) return printNode(obj, indentation, theme, refs);
 
   let keys = Object.keys(obj);
@@ -93,6 +100,10 @@ let printObject = (obj /*: Object */, indentation, theme, refs) => {
 
 let isNodeLike = (obj /*: Object */) => {
   return typeof obj.type === 'string';
+};
+
+let isPathLike = (obj /*: Object */) => {
+  return typeof obj.type === 'string' && obj.hasOwnProperty('node');
 };
 
 let printLocationNumber = val => {
@@ -134,6 +145,10 @@ let DROP_KEYS = {
   start: true,
   end: true,
   loc: true,
+};
+
+let printPath = (path /*: Path */, indentation, theme, refs) => {
+  return 'Path: ' + printValue(path.node, indentation, theme, refs);
 };
 
 let printNode = (node /*: Node */, indentation, theme, refs) => {
