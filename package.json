@@ -10,6 +10,7 @@
     "flow-bin": "^0.46.0"
   },
   "dependencies": {
-    "ansi-styles": "^3.0.0"
+    "pretty-format": "^20.0.3",
+    "pretty-format-ast": "^1.0.0"
   }
 }

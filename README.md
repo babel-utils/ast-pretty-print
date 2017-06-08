@@ -17,49 +17,31 @@ let printed = printAST(ast);
 console.log(printed);
 ```
 
-```
-FunctionDeclaration (1:0, 1:31)
+```js
+Node "FunctionDeclaration"
+  __clone: [Function __clone]
   async: false
-  body: BlockStatement (1:29, 1:31)
-    body: []
-    directives: []
+  body: Node "BlockStatement" (1:29, 1:31)
+    body: Array []
+    directives: Array []
   expression: false
   generator: false
-  id: Identifier (1:9, 1:10)
-    name: 'a'
-  params:
-    - Identifier (1:11, 1:18)
-        name: 'b'
-        typeAnnotation: TypeAnnotation (1:12, 1:18)
-          typeAnnotation: StringLiteralTypeAnnotation (1:14, 1:18)
-            extra:
-              raw: 'hi'
-              rawValue: 'hi'
-            value: 'hi'
-    - Identifier (1:20, 1:21)
-        name: 'c'
-    - RestElement (1:23, 1:27)
-        argument: Identifier (1:26, 1:27)
-          name: 'd'
-```
-
-AST Nodes are expected to have this shape:
-
-```js
-type Node = {
-  type: string,
-  start?: number, // ignored
-  end?: number, // ignored
-  loc?: {
-    start?: {
-      line?: number,
-      column?: number,
-    },
-    end?: {
-      line?: number,
-      column?: number,
-    },
-  },
-  [key: string]: mixed,
-};
+  id: Node "Identifier" (1:9, 1:10)
+    name: "a"
+  params: Array [
+    Node "Identifier" (1:11, 1:18)
+      name: "b"
+      typeAnnotation: Node "TypeAnnotation" (1:12, 1:18)
+          typeAnnotation: Node "StringLiteralTypeAnnotation" (1:14, 1:18)
+              extra: Object {
+                  "raw": "\"hi\"",
+                  "rawValue": "hi",
+                }
+             value: "hi",
+    Node "Identifier" (1:20, 1:21)
+      name: "c",
+    Node "RestElement" (1:23, 1:27)
+      argument: Node "Identifier" (1:26, 1:27)
+        name: "d",
+  ]
 ```
