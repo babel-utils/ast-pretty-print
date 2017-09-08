@@ -1,6 +1,6 @@
 {
   "name": "ast-pretty-print",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A pretty printer for AST-like structures",
   "main": "index.js",
   "author": "James Kyle <me@thejameskyle.com>",
